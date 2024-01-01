@@ -1,0 +1,3 @@
+const { TelegramClient} = require("telegram")
+const { StringSession } = require("telegram/sessions")
+module.exports = new TelegramClient(new StringSession("1AgAOMTQ5LjE1NC4xNjcuNDEBu16XOT3V6s+pHiZ2lT1BL+4EO/2l7tQHqXSmAimanK6g37Nse11X1SUzbIPtoEHtOHvE5cfBVQI5H/MqHjXCv2GchDTODQd8ZEyQSNLI2PPumFsEd0wwyLrtzcp8JquPHKWE55Idpg3XzUjLoWQmsDjLbStFiVPXJbBnETOE0KRbm4HvwTnBDgz+41/RAPk9iFzCnXgEtPajcsRr5GPk7VkHro8a/kTMqpPGMuwa5X1XOd4L3s4FUUybiLXwi4rbE4MmGYO1YANub9vjCSQn16PagF1ruvpmsucc/B1l+S+Uf+cgm4RiFhCaF3+UYbvYfMk5uyQ8RdHAFp3kxrUM+lM="), 16073924, "16b2123055b4c7e80c80888a36da461f"); // https://my.telegram.org/apps => login => create app
