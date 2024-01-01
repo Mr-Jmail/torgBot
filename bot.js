@@ -11,7 +11,6 @@ const client = configClient
 const idOfNeededChannel = 1853036360 // Переслать сообщение из канала в @getmyid_bot из "Forwarded from chat" убрать -100
 
 const alertsToChannelIdFilePath = path.join(__dirname, "alertsToChannelId.json")
-const alertsToChannelId = getAlertsToChannelIdJson()
 
 ;(async function() {
     await client.start()
@@ -45,7 +44,7 @@ const alertsToChannelId = getAlertsToChannelIdJson()
             }
         }
 
-        if(channelId != idOfNeededChannel) return console.log(`Message not from needed channel. ChannelId: ${channelId}. Text: ${message?.message}`)
+        if(channelId != idOfNeededChannel) return
 
 
         if(!text.includes("Buys")) return console.log(`Message https://t.me/CoinSonarV2/${message.id}\nDon't contain "Buys"`)
@@ -79,9 +78,10 @@ const alertsToChannelId = getAlertsToChannelIdJson()
 
 
 function getChannelIdToRepost(alerts) {
+    var alertsToChannelId = getAlertsToChannelIdJson()
     for (var key in alertsToChannelId) {
         if(Number(key) && Number(key) == alerts) return alertsToChannelId[key]
-        if(!key.includes("-")) return 0
+        if(!key.includes("-")) continue
         var [ startNumber, endNumber ] = key.split("-")
         if(alerts >= startNumber && alerts <= endNumber) return alertsToChannelId[key]
     }
