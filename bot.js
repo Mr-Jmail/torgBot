@@ -10,9 +10,7 @@ const idOfNeededChannel = 1853036360 // Переслать сообщение и
 
 const alertsToChannelId = {
     "1-2": -1002106630709,
-    "3-8": -1002106630709,
-    "10": -1002106630709,
-    "other": -1002106630709
+    "3-8": -1002106630709
 }
 ;(async function() {
     await client.start()
@@ -34,6 +32,7 @@ const alertsToChannelId = {
         const namOfCurrency = match ? match[1] : undefined;
 
         var channelIdToReposte = getChannelIdToRepost(alerts)
+        if(channelIdToReposte == 0) return
         var textToReposte = text.replace("Price:", "Enter above:").replace(`$${namOfCurrency}`, `${namOfCurrency}/USDT`)
 
         await client.sendMessage(channelIdToReposte, { message: `Ориг\n${text}` })
@@ -48,8 +47,8 @@ const alertsToChannelId = {
 
 function getChannelIdToRepost(alerts) {
     for (var key in alertsToChannelId) {
-        if(key == "other") return alertsToChannelId[key]
         if(Number(key) && Number(key) == alerts) return alertsToChannelId[key]
+        if(!key.includes("-")) return 0
         var [ startNumber, endNumber ] = key.split("-")
         if(alerts >= startNumber && alerts <= endNumber) return alertsToChannelId[key]
     }
