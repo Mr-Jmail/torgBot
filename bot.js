@@ -48,21 +48,23 @@ const alertsToChannelId = getAlertsToChannelIdJson()
         if(channelId != idOfNeededChannel) return
 
 
-        if(!text.includes("Buys")) return
+        if(!text.includes("Buys")) return console.log(`Message https://t.me/CoinSonarV2/${message.id}\nDon't contain "Buys"`)
         var alerts = text.split("Alerts in this hour: ")[1].split(" ")[0]
         try {alerts = Number(alerts)}
-        catch(err) {return console.log(err)}
+        catch(err) {return console.log(`Message https://t.me/CoinSonarV2/${message.id}\nAlert is not a number: ${alerts}`);}
 
         const match = text.match(/\$(\w+)/);
         const namOfCurrency = match ? match[1] : undefined;
 
         var channelIdToReposte = getChannelIdToRepost(alerts)
-        if(channelIdToReposte == 0) return
+        if(channelIdToReposte == 0) return console.log(`Message https://t.me/CoinSonarV2/${message.id}\nCant find channelId to resend. Alerts: ${alerts}`)
         var textToReposte = text.replace("Price:", "Enter above:").replace(`$${namOfCurrency}`, `${namOfCurrency}/USDT`)
 
         const caption = `Измененный\n${textToReposte}`;
         
-        await client.sendFile(-1002106630709, {
+        if(!message.photo) return await client.sendMessage(channelIdToReposte, {message: caption})
+
+        await client.sendFile(channelIdToReposte, {
             file: new Api.InputMediaPhoto({
                 id: new Api.InputPhoto({
                     id: message.photo.id,
@@ -72,8 +74,6 @@ const alertsToChannelId = getAlertsToChannelIdJson()
             }),
             caption
         })
-
-        await client.sendMessage(channelIdToReposte, { message: `Ориг\n${text}` })
     }, new NewMessage())
 })()
 
