@@ -2,16 +2,16 @@ const { TelegramClient, Api } = require("telegram");
 const { StringSession } = require("telegram/sessions");
 const { NewMessage } = require("telegram/events"); // npm i input
 const genStringSession = require("./genStringSession");
+const fs = require("fs")
 const configClient = require("./configClient");
+const path = require("path");
 const client = configClient
 
 // const idOfNeededChannel = 2069599112 // Test. Переслать сообщение из канала в @getmyid_bot из "Forwarded from chat" убрать -100
 const idOfNeededChannel = 1853036360 // Переслать сообщение из канала в @getmyid_bot из "Forwarded from chat" убрать -100
 
-const alertsToChannelId = {
-    "1-2": -1002106630709,
-    "3-8": -1002106630709
-}
+const alertsToChannelIdFilePath = path.join(__dirname, "alertsToChannelId.json")
+const alertsToChannelId = getAlertsToChannelIdJson()
 
 ;(async function() {
     await client.start()
@@ -19,6 +19,31 @@ const alertsToChannelId = {
         var message = event?.message
         var channelId = message?.peerId?.channelId
         var text = message?.message
+
+        if(text == "/getConfig") return client.sendFile(message.peerId.userId, {file: alertsToChannelIdFilePath})
+        if(message?.file?.media?.mimeType == "application/json" && message?.message == "/updateConfig") {
+            var newFilePath = path.join(__dirname, "alertsToChannelId2.json")
+            await client.downloadFile(
+                new Api.InputDocumentFileLocation({
+                    id: message.file.media.id,
+                    accessHash: message.file.media.accessHash,
+                    fileReference: message.file.media.fileReference,
+                    thumbSize: message.file.media.size.toString()
+                }),
+                {
+                    outputFile: newFilePath
+                }
+            )
+            try {
+                JSON.parse(fs.readFileSync(newFilePath, "utf-8"))
+                fs.renameSync(newFilePath, alertsToChannelIdFilePath)
+                await client.sendMessage(message.peerId.userId, {message: "Configuration is successfully updated"})
+            } 
+            catch (err) {
+                await client.sendMessage(message.peerId.userId, {message: "Config has incorrect format. Configuration was not updated"})
+                fs.rmSync(newFilePath, { force: true })
+            }
+        }
 
         if(channelId != idOfNeededChannel) return
 
@@ -31,7 +56,6 @@ const alertsToChannelId = {
         const match = text.match(/\$(\w+)/);
         const namOfCurrency = match ? match[1] : undefined;
 
-        console.log(alerts)
         var channelIdToReposte = getChannelIdToRepost(alerts)
         if(channelIdToReposte == 0) return
         var textToReposte = text.replace("Price:", "Enter above:").replace(`$${namOfCurrency}`, `${namOfCurrency}/USDT`)
@@ -49,8 +73,6 @@ const alertsToChannelId = {
             caption
         })
 
-        console.log(channelIdToReposte)
-
         await client.sendMessage(channelIdToReposte, { message: `Ориг\n${text}` })
     }, new NewMessage())
 })()
@@ -67,3 +89,7 @@ function getChannelIdToRepost(alerts) {
 }
 
 // genStringSession()
+
+function getAlertsToChannelIdJson() {
+    return JSON.parse(fs.readFileSync(alertsToChannelIdFilePath))
+}
