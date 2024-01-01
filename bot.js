@@ -45,7 +45,7 @@ const alertsToChannelId = getAlertsToChannelIdJson()
             }
         }
 
-        if(channelId != idOfNeededChannel) return
+        if(channelId != idOfNeededChannel) return console.log(`Message not from needed channel. ChannelId: ${channelId}. Text: ${message?.message}`)
 
 
         if(!text.includes("Buys")) return console.log(`Message https://t.me/CoinSonarV2/${message.id}\nDon't contain "Buys"`)
