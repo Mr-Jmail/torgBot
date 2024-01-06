@@ -1,5 +1,4 @@
-const { TelegramClient, Api } = require("telegram");
-const { StringSession } = require("telegram/sessions");
+const { Api } = require("telegram");
 const { NewMessage } = require("telegram/events"); // npm i input
 const genStringSession = require("./genStringSession");
 const fs = require("fs")

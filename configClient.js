@@ -1,3 +1,5 @@
+const path = require("path")
+require("dotenv").config({path: path.join(__dirname, ".env")})
 const { TelegramClient} = require("telegram")
 const { StringSession } = require("telegram/sessions")
-module.exports = new TelegramClient(new StringSession("1AgAOMTQ5LjE1NC4xNjcuNDEBu7qIhXSvUe+pM7GIbHTHtbveiMSGeVHUtdc1wZQ7BtO2O5wCjLVZt3W4Ub2cCv00ctxtR7NlbwxRvzLQugfnP8hdPqlMCWu2K0FSo2DuSZeIESsRt68wmOJ0rOk9kbNIUD4mdbsCjKFeSE0jg23Udm03F4O6vdWgXe2Xc5TGT++DXVz7tFSGGOj0DJutO0z7JyyLw2ghEfQfrfbToebxjDa+0MY8FyuvC5lJGFZu5f+ByeH5LI8S9QWFuGRSCWU7YGcxWF7QclFuayzGWKg/8JgO8whXZjt/BbGUUyfD/e2LldEZmojaZu6T7J1s518j+g28KSG4SDImN+BxkYIaUV0="), 21784172, "b46c457a3fbf19609e651874c842f252"); // https://my.telegram.org/apps => login => create app
+module.exports = new TelegramClient(new StringSession(process.env.stringSession), Number(process.env.appId), process.env.appHash); // https://my.telegram.org/apps => login => create app
