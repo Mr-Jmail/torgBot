@@ -19,7 +19,7 @@ const alertsToChannelIdFilePath = path.join(__dirname, "alertsToChannelId.json")
         var channelId = message?.peerId?.channelId
         var text = message?.message
 
-        if(text == "/getConfig") return client.sendFile(message.peerId.userId, {file: alertsToChannelIdFilePath})
+        if(text == "/getConfig") return client.sendFile(await message.getInputSender(), {file: alertsToChannelIdFilePath})
         if(message?.file?.media?.mimeType == "application/json" && message?.message == "/updateConfig") {
             var newFilePath = path.join(__dirname, "alertsToChannelId2.json")
             await client.downloadFile(
@@ -36,10 +36,10 @@ const alertsToChannelIdFilePath = path.join(__dirname, "alertsToChannelId.json")
             try {
                 JSON.parse(fs.readFileSync(newFilePath, "utf-8"))
                 fs.renameSync(newFilePath, alertsToChannelIdFilePath)
-                await client.sendMessage(message.peerId.userId, {message: "Configuration is successfully updated"})
+                await client.sendMessage(await message.getInputSender(), {message: "Configuration is successfully updated"})
             } 
             catch (err) {
-                await client.sendMessage(message.peerId.userId, {message: "Config has incorrect format. Configuration was not updated"})
+                await client.sendMessage(await message.getInputSender(), {message: "Config has incorrect format. Configuration was not updated"})
                 fs.rmSync(newFilePath, { force: true })
             }
         }
@@ -57,11 +57,10 @@ const alertsToChannelIdFilePath = path.join(__dirname, "alertsToChannelId.json")
 
         var channelIdToReposte = getChannelIdToRepost(alerts)
         if(channelIdToReposte == 0) return console.log(`Message https://t.me/CoinSonarV2/${message.id}\nCant find channelId to resend. Alerts: ${alerts}`)
-        var textToReposte = text.replace("Price:", "Enter above:").replace(`$${namOfCurrency}`, `${namOfCurrency}/USDT`)
+        var textToReposte = text.replace("Price:", "Enter above:").replace(`$${namOfCurrency}`, `${namOfCurrency}/USDT`).replace("Buys: ", "")
 
-        const caption = `Измененный\n${textToReposte}`;
         
-        if(!message.photo) return await client.sendMessage(channelIdToReposte, {message: caption})
+        if(!message.photo) return await client.sendMessage(channelIdToReposte, {message: textToReposte})
 
         await client.sendFile(channelIdToReposte, {
             file: new Api.InputMediaPhoto({
@@ -71,7 +70,7 @@ const alertsToChannelIdFilePath = path.join(__dirname, "alertsToChannelId.json")
                     fileReference: message.photo.fileReference
                 })
             }),
-            caption
+            caption: textToReposte
         })
     }, new NewMessage())
 })()
