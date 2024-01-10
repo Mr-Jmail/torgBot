@@ -51,26 +51,31 @@ const alertsToChannelIdFilePath = path.join(__dirname, "alertsToChannelId.json")
         try {alerts = Number(alerts)}
         catch(err) {return console.log(`Message https://t.me/CoinSonarV2/${message.id}\nAlert is not a number: ${alerts}`);}
 
-        const match = text.match(/\$(\w+)/);
-        const namOfCurrency = match ? match[1] : undefined;
+        const matchForNameOfCurrency = text.match(/\$(\w+)/);
+        const nameOfCurrency = matchForNameOfCurrency ? matchForNameOfCurrency[1] : undefined;
 
         var channelIdToReposte = getChannelIdToRepost(alerts)
         if(channelIdToReposte == 0) return console.log(`Message https://t.me/CoinSonarV2/${message.id}\nCant find channelId to resend. Alerts: ${alerts}`)
-        var textToReposte = text.replace("Price:", "Enter above:").replace(`$${namOfCurrency}`, `${namOfCurrency}/USDT`).replace("Buys: ", "")
+        const matchForPriceValue = text.match(/Price: (\d+\.\d+)/);
+        const priceValue = matchForPriceValue ? matchForPriceValue[1] : undefined;
+        var textToReposte = `${nameOfCurrency}/USDT\nEnter above: ${priceValue}`
 
         
-        if(!message.photo) return await client.sendMessage(channelIdToReposte, {message: textToReposte})
-
-        await client.sendFile(channelIdToReposte, {
-            file: new Api.InputMediaPhoto({
-                id: new Api.InputPhoto({
-                    id: message.photo.id,
-                    accessHash: message.photo.accessHash,
-                    fileReference: message.photo.fileReference
-                })
-            }),
-            caption: textToReposte
-        })
+        if(!message.photo) await client.sendMessage(channelIdToReposte, {message: text}) // Репост ориг сообщения
+        else {
+            await client.sendFile(channelIdToReposte, { // Репост ориг сообщения
+                file: new Api.InputMediaPhoto({
+                    id: new Api.InputPhoto({
+                        id: message.photo.id,
+                        accessHash: message.photo.accessHash,
+                        fileReference: message.photo.fileReference
+                    })
+                }),
+                caption: text
+            })
+        }
+        
+        return client.sendMessage(channelIdToReposte, {message: textToReposte}) // Пересылка измененного сообщения
     }, new NewMessage())
 })()
 
