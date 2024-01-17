@@ -57,8 +57,8 @@ const alertsToChannelIdFilePath = path.join(__dirname, "alertsToChannelId.json")
         var channelIdToReposte = getChannelIdToRepost(alerts)
         if(channelIdToReposte == 0) return console.log(`Message https://t.me/CoinSonarV2/${message.id}\nCant find channelId to resend. Alerts: ${alerts}`)
         const matchForPriceValue = text.match(/Price: (\d+\.\d+)/);
-        const priceValue = matchForPriceValue ? matchForPriceValue[1] : undefined;
-        var textToReposte = `${nameOfCurrency}/USDT\nEnter above: ${priceValue}`
+        const priceValue = matchForPriceValue ? matchForPriceValue[1] : 0;
+        var textToReposte = `${nameOfCurrency}/USDT\nEnter above: ${priceValue}\nStop-loss: ${priceValue * 0.97}`
 
         
         if(!message.photo) await client.sendMessage(channelIdToReposte, {message: text}) // Репост ориг сообщения
